@@ -1,4 +1,5 @@
 const Sweet = require("../models/Sweet");
+const { sendError } = require("../utils/apiResponse");
 
 function parsePositiveInt(raw, fieldName) {
   const n = Number(raw);
@@ -40,14 +41,22 @@ async function addSweet(req, res, next) {
     const { name, category, price, quantity } = req.body;
 
     if (!name || !category || price === undefined || quantity === undefined) {
-      return res.status(400).json({ message: "name, category, price, quantity are required" });
+      return sendError(res, {
+        status: 400,
+        code: "VALIDATION_ERROR",
+        message: "name, category, price, quantity are required",
+      });
     }
 
     const parsedPrice = parseNonNegativeNumber(price, "price");
-    if (parsedPrice.error) return res.status(400).json({ message: parsedPrice.error });
+    if (parsedPrice.error) {
+      return sendError(res, { status: 400, code: "VALIDATION_ERROR", message: parsedPrice.error });
+    }
 
     const parsedQty = parseNonNegativeInt(quantity, "quantity");
-    if (parsedQty.error) return res.status(400).json({ message: parsedQty.error });
+    if (parsedQty.error) {
+      return sendError(res, { status: 400, code: "VALIDATION_ERROR", message: parsedQty.error });
+    }
 
     const sweet = await Sweet.create({
       name,
@@ -90,13 +99,17 @@ async function searchSweets(req, res, next) {
 
       if (minPrice !== undefined) {
         const parsed = parseNonNegativeNumber(minPrice, "minPrice");
-        if (parsed.error) return res.status(400).json({ message: parsed.error });
+        if (parsed.error) {
+          return sendError(res, { status: 400, code: "VALIDATION_ERROR", message: parsed.error });
+        }
         filter.price.$gte = parsed.value;
       }
 
       if (maxPrice !== undefined) {
         const parsed = parseNonNegativeNumber(maxPrice, "maxPrice");
-        if (parsed.error) return res.status(400).json({ message: parsed.error });
+        if (parsed.error) {
+          return sendError(res, { status: 400, code: "VALIDATION_ERROR", message: parsed.error });
+        }
         filter.price.$lte = parsed.value;
       }
     }
@@ -115,19 +128,31 @@ async function updateSweet(req, res, next) {
     const updates = {};
     const allowed = ["name", "category", "price", "quantity"];
 
+    if (!allowed.some((k) => req.body[k] !== undefined)) {
+      return sendError(res, {
+        status: 400,
+        code: "VALIDATION_ERROR",
+        message: "At least one of name, category, price, quantity must be provided",
+      });
+    }
+
     for (const key of allowed) {
       if (req.body[key] === undefined) continue;
 
       if (key === "price") {
         const parsed = parseNonNegativeNumber(req.body[key], "price");
-        if (parsed.error) return res.status(400).json({ message: parsed.error });
+        if (parsed.error) {
+          return sendError(res, { status: 400, code: "VALIDATION_ERROR", message: parsed.error });
+        }
         updates.price = parsed.value;
         continue;
       }
 
       if (key === "quantity") {
         const parsed = parseNonNegativeInt(req.body[key], "quantity");
-        if (parsed.error) return res.status(400).json({ message: parsed.error });
+        if (parsed.error) {
+          return sendError(res, { status: 400, code: "VALIDATION_ERROR", message: parsed.error });
+        }
         updates.quantity = parsed.value;
         continue;
       }
@@ -136,7 +161,13 @@ async function updateSweet(req, res, next) {
     }
 
     const sweet = await Sweet.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
-    if (!sweet) return res.status(404).json({ message: "Sweet not found" });
+    if (!sweet) {
+      return sendError(res, {
+        status: 404,
+        code: "SWEET_NOT_FOUND",
+        message: "Sweet not found",
+      });
+    }
 
     return res.json(sweet);
   } catch (err) {
@@ -149,7 +180,13 @@ async function deleteSweet(req, res, next) {
     const { id } = req.params;
     const sweet = await Sweet.findByIdAndDelete(id);
 
-    if (!sweet) return res.status(404).json({ message: "Sweet not found" });
+    if (!sweet) {
+      return sendError(res, {
+        status: 404,
+        code: "SWEET_NOT_FOUND",
+        message: "Sweet not found",
+      });
+    }
 
     return res.json({ message: "Sweet deleted" });
   } catch (err) {
@@ -161,13 +198,25 @@ async function purchaseSweet(req, res, next) {
   try {
     const { id } = req.params;
     const parsed = parsePurchaseQuantity(req);
-    if (parsed.error) return res.status(400).json({ message: parsed.error });
+    if (parsed.error) {
+      return sendError(res, { status: 400, code: "VALIDATION_ERROR", message: parsed.error });
+    }
 
     const sweet = await Sweet.findById(id);
-    if (!sweet) return res.status(404).json({ message: "Sweet not found" });
+    if (!sweet) {
+      return sendError(res, {
+        status: 404,
+        code: "SWEET_NOT_FOUND",
+        message: "Sweet not found",
+      });
+    }
 
     if (sweet.quantity < parsed.value) {
-      return res.status(400).json({ message: "Insufficient stock" });
+      return sendError(res, {
+        status: 400,
+        code: "INSUFFICIENT_STOCK",
+        message: "Insufficient stock",
+      });
     }
 
     sweet.quantity -= parsed.value;
@@ -183,10 +232,18 @@ async function restockSweet(req, res, next) {
   try {
     const { id } = req.params;
     const parsed = parsePurchaseQuantity(req);
-    if (parsed.error) return res.status(400).json({ message: parsed.error });
+    if (parsed.error) {
+      return sendError(res, { status: 400, code: "VALIDATION_ERROR", message: parsed.error });
+    }
 
     const sweet = await Sweet.findById(id);
-    if (!sweet) return res.status(404).json({ message: "Sweet not found" });
+    if (!sweet) {
+      return sendError(res, {
+        status: 404,
+        code: "SWEET_NOT_FOUND",
+        message: "Sweet not found",
+      });
+    }
 
     sweet.quantity += parsed.value;
     await sweet.save();
