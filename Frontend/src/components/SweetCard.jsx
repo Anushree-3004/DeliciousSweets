@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import apiClient from "../api/apiClient";
 import { getErrorMessage } from "../api/getErrorMessage";
+import { AuthContext } from "../context/AuthContext";
 
 /**
  * Displays a single sweet
- * Includes purchase button
+ * Includes purchase button (admin only)
  */
 const SweetCard = ({ sweet, refresh }) => {
+  const { role } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -33,16 +35,27 @@ const SweetCard = ({ sweet, refresh }) => {
 
       <p>Price: ₹{sweet.price}</p>
       <p>Stock: {sweet.quantity}</p>
+      <p className="muted" style={{ fontSize: "12px", marginTop: "4px" }}>
+        ID: {sweet._id}
+      </p>
 
       {error && <p className="error">{error}</p>}
 
-      <button
-        className="btn"
-        onClick={handlePurchase}
-        disabled={loading || sweet.quantity === 0}
-      >
-        {sweet.quantity === 0 ? "Out of stock" : loading ? "Purchasing..." : "Purchase"}
-      </button>
+      {role === "admin" && (
+        <button
+          className="btn"
+          onClick={handlePurchase}
+          disabled={loading || sweet.quantity === 0}
+        >
+          {sweet.quantity === 0 ? "Out of stock" : loading ? "Purchasing..." : "Purchase"}
+        </button>
+      )}
+
+      {role !== "admin" && (
+        <p className="muted" style={{ fontSize: "14px", marginTop: "8px" }}>
+          Admin only: Purchase
+        </p>
+      )}
     </div>
   );
 };
