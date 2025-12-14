@@ -1,0 +1,27 @@
+# dependencies
+**/node_modules/
+
+# env
+**/.env
+**/.env.*
+
+# logs
+**/logs/
+**/*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Frontend build
+Frontend/dist/
+
+# Backend
+Backend/coverage/
+Backend/.nyc_output/
+
+# misc
+*.tmp
+*.swp
