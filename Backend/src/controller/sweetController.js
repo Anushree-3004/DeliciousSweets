@@ -67,6 +67,16 @@ async function addSweet(req, res, next) {
 
     return res.status(201).json(sweet);
   } catch (err) {
+    // Duplicate key (e.g., unique sweet name)
+    if (err && err.code === 11000) {
+      return sendError(res, {
+        status: 409,
+        code: "SWEET_ALREADY_EXISTS",
+        message: "Sweet already exists",
+        details: err.keyValue,
+      });
+    }
+
     return next(err);
   }
 }
@@ -171,6 +181,15 @@ async function updateSweet(req, res, next) {
 
     return res.json(sweet);
   } catch (err) {
+    if (err && err.code === 11000) {
+      return sendError(res, {
+        status: 409,
+        code: "SWEET_ALREADY_EXISTS",
+        message: "Sweet already exists",
+        details: err.keyValue,
+      });
+    }
+
     return next(err);
   }
 }

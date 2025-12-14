@@ -21,10 +21,10 @@ router.use(authMiddleware);
 router.post("/", addSweet);
 router.get("/", getSweets);
 router.get("/search", searchSweets);
-router.put("/:id", updateSweet);
+router.put("/:id", adminMiddleware, updateSweet);
 router.delete("/:id", adminMiddleware, deleteSweet);
 
-router.post("/:id/purchase", purchaseSweet);
+router.post("/:id/purchase", adminMiddleware, purchaseSweet);
 router.post("/:id/restock", adminMiddleware, restockSweet);
 
 module.exports = router;

@@ -1,0 +1,12 @@
+feat: Add separate Search page for filtering sweets
+
+- Create new Search.jsx page component with search/filter functionality
+- Add /sweets/search route in App.jsx
+- Add Search link to Navbar (visible when authenticated)
+- Remove search functionality from Dashboard page
+- Dashboard now only displays all sweets without filters
+
+Used an AI assistant to create the Search page component and update routing.
+
+Co-authored-by: ChatGPT <chatgpt@openai.com>
+
