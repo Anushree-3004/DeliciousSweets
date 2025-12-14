@@ -18,9 +18,18 @@ const Navbar = () => {
       </div>
 
       <div className="navbar-right">
-        <NavLink to="/" className={({ isActive }) => (isActive ? "navlink active" : "navlink")}>
+        <NavLink to="/dashboard" className={({ isActive }) => (isActive ? "navlink active" : "navlink")}>
           Dashboard
         </NavLink>
+
+        {isAuthenticated && (
+          <NavLink
+            to="/sweets/search"
+            className={({ isActive }) => (isActive ? "navlink active" : "navlink")}
+          >
+            Search
+          </NavLink>
+        )}
 
         {!isAuthenticated && (
           <>
