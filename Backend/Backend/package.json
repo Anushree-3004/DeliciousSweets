@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "sweet-shop-backend": "file:.."
+  }
+}
