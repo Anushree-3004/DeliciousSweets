@@ -1,5 +1,3 @@
-
-You said:
 # 🍬 DeliciousSweets — Sweet Shop Management System
 
 DeliciousSweets is a full-stack **Sweet Shop Management System** designed and developed as a **Test-Driven Development (TDD) Kata**.  
@@ -187,7 +185,7 @@ The test suite validates the following functionality:
 
 To run the full backend test suite:
 
-``bash
+bash
 cd Backend
 npm test
 
@@ -199,6 +197,13 @@ Each test suite cleans up data to ensure isolation
 Edge cases and failure scenarios are explicitly tested
 The test suite ensures that the backend behaves correctly under real-world conditions and that critical business logic remains stable as the application evolves.
 
+## 🌐 deployed application
 
+the application is fully deployed with separate frontend and backend services.
 
+frontend (react app):
+https://delicioussweets.onrender.com
+
+backend (node.js / express api):
+https://delicioussweets-backend.onrender.com
 
