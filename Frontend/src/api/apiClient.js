@@ -1,11 +1,7 @@
 import axios from "axios";
 
-/**
- * Centralized Axios instance for API calls
- * Automatically attaches JWT token if present
- */
 const apiClient = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: `${import.meta.env.VITE_API_URL}/api`,
 });
 
 apiClient.interceptors.request.use((config) => {
